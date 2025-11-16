@@ -1,0 +1,5 @@
+clearml:
+  _target_: training.src.loggers.clearml_logger.ClearMLLogger
+  # save_dir: "${paths.output_dir}/clearml/"
+  project_name: "Chest X-Ray Report Generator"
+  # experiment_name: "experiment"

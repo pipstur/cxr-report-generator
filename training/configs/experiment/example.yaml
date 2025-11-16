@@ -1,0 +1,42 @@
+# @package _global_
+
+# to execute this experiment run:
+# python train.py experiment=example
+
+defaults:
+  - override /data: default
+  - override /model: efficientformer
+  - override /callbacks: default
+  - override /trainer: default
+
+tags: ["cxr", "efficientformer"]
+
+seed: 27
+
+trainer:
+  min_epochs: 1
+  max_epochs: 10
+
+model:
+  optimizer:
+    _target_: torch.optim.Adam
+    _partial_: True
+    lr: 0.001
+    weight_decay: 0.0
+
+  scheduler:
+    _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+    _partial_: True
+    mode: min
+    factor: 0.1
+    patience: 10
+
+  freeze_backbone: False
+
+
+data:
+  batch_size: 64
+
+logger:
+  tesnorboard:
+    log_dir: ${paths.logs_dir}tensorboard/
