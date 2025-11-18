@@ -1,10 +1,11 @@
 from pathlib import Path
 
 import pytest
-from tests.helpers.run_if import RunIf
-from tests.helpers.run_sh_command import run_sh_command
 
-startfile = "src/train.py"
+from training.tests.helpers.run_if import RunIf
+from training.tests.helpers.run_sh_command import run_sh_command
+
+startfile = "training/src/train.py"
 overrides = ["logger=[]"]
 
 

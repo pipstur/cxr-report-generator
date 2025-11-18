@@ -5,7 +5,8 @@ import pandas as pd
 import pytest
 import torch
 from PIL import Image
-from src.data.datamodule import CXRDataModule
+
+from training.src.data.datamodule import CXRDataModule
 
 COLUMNS = [
     "Path",
@@ -116,7 +117,7 @@ def test_cxr_datamodule(dummy_cxr_dataset):
     dm = CXRDataModule(
         data_dir=str(dummy_cxr_dataset),
         batch_size=2,
-        num_workers=0,
+        num_workers=2,
         pin_memory=False,
     )
 
