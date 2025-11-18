@@ -1,4 +1,4 @@
-_target_: src.models.efficientformer.EfficientFormer
+_target_: training.src.models.efficientformer.EfficientFormer
 
 optimizer:
   _target_: torch.optim.Adam

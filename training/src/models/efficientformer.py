@@ -1,9 +1,9 @@
 import timm
 import torch
+from torch import nn
 
 # from training.src.models.components.loss_functions import get_loss_function
-from src.models.components.model_class import Model
-from torch import nn
+from training.src.models.components.model_class import Model
 
 torch.use_deterministic_algorithms(True, warn_only=True)
 
