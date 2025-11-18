@@ -20,9 +20,6 @@ def generate_dummy_chexpert_dataset(base_dir, num_train=20, num_val=10, img_size
     os.makedirs(train_dir, exist_ok=True)
     os.makedirs(val_dir, exist_ok=True)
 
-    # -------------------------------
-    # DEFINE LABEL COLUMNS (example)
-    # -------------------------------
     label_cols = [
         "No Finding",
         "Enlarged Cardiomediastinum",
@@ -44,9 +41,6 @@ def generate_dummy_chexpert_dataset(base_dir, num_train=20, num_val=10, img_size
         arr = np.random.randint(0, 255, (img_size[0], img_size[1], 3), dtype=np.uint8)
         Image.fromarray(arr).save(path)
 
-    # -------------------------------
-    # GENERATE TRAIN SET
-    # -------------------------------
     train_rows = []
     for i in range(num_train):
         patient_id = f"patient{i+1}"
@@ -64,13 +58,10 @@ def generate_dummy_chexpert_dataset(base_dir, num_train=20, num_val=10, img_size
         }
 
         for c in label_cols:
-            row[c] = int(np.random.randint(0, 2))  # fake binary labels
+            row[c] = int(np.random.randint(0, 2))
 
         train_rows.append(row)
 
-    # -------------------------------
-    # GENERATE VALID SET
-    # -------------------------------
     val_rows = []
     for i in range(num_val):
         patient_id = f"patientV{i+1}"
@@ -92,9 +83,6 @@ def generate_dummy_chexpert_dataset(base_dir, num_train=20, num_val=10, img_size
 
         val_rows.append(row)
 
-    # -------------------------------
-    # SAVE CSV
-    # -------------------------------
     train_df = pd.DataFrame(train_rows)
     val_df = pd.DataFrame(val_rows)
 
