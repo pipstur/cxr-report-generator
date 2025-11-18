@@ -43,7 +43,7 @@ def generate_dummy_chexpert_dataset(base_dir, num_train=20, num_val=10, img_size
 
     train_rows = []
     for i in range(num_train):
-        patient_id = f"patient{i+1}"
+        patient_id = f"patient{i + 1}"
         img_name = f"{patient_id}_frontal.jpg"
         img_path = os.path.join(train_dir, img_name)
 
@@ -64,7 +64,7 @@ def generate_dummy_chexpert_dataset(base_dir, num_train=20, num_val=10, img_size
 
     val_rows = []
     for i in range(num_val):
-        patient_id = f"patientV{i+1}"
+        patient_id = f"patientV{i + 1}"
         img_name = f"{patient_id}_frontal.jpg"
         img_path = os.path.join(val_dir, img_name)
 
