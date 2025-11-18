@@ -148,7 +148,7 @@ class CXRDataModule(LightningDataModule):
             batch_size=self.hparams.batch_size,
             num_workers=self.hparams.num_workers,
             pin_memory=self.hparams.pin_memory,
-            persistent_workers=True,
+            persistent_workers=self.hparams.num_workers > 0,
             shuffle=True,
         )
 
@@ -162,7 +162,7 @@ class CXRDataModule(LightningDataModule):
             batch_size=self.hparams.batch_size,
             num_workers=self.hparams.num_workers,
             pin_memory=self.hparams.pin_memory,
-            persistent_workers=True,
+            persistent_workers=self.hparams.num_workers > 0,
             shuffle=False,
         )
 
@@ -176,7 +176,7 @@ class CXRDataModule(LightningDataModule):
             batch_size=self.hparams.batch_size,
             num_workers=self.hparams.num_workers,
             pin_memory=self.hparams.pin_memory,
-            persistent_workers=True,
+            persistent_workers=self.hparams.num_workers > 0,
             shuffle=False,
         )
 
