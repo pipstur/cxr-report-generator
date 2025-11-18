@@ -1,12 +1,12 @@
 from pathlib import Path
 
 import numpy as np
-import pandas as pd
 import pytest
 import torch
 from PIL import Image
 
 from training.src.data.datamodule import CXRDataModule
+from training.tests.helpers.generate_dummy_data import generate_dummy_chexpert_dataset
 
 COLUMNS = [
     "Path",
@@ -41,75 +41,7 @@ def create_dummy_image(path: Path):
 
 @pytest.fixture
 def dummy_cxr_dataset(tmp_path):
-    # Make directories
-    train_dir = tmp_path / "train"
-    val_dir = tmp_path / "val"
-    train_dir.mkdir()
-    val_dir.mkdir()
-
-    # Create dummy images + CSV entries
-    train_rows = []
-    val_rows = []
-
-    for i in range(3):
-        img_path = train_dir / f"img{i}.jpg"
-        create_dummy_image(img_path)
-        row = [
-            str(img_path),
-            "Male",
-            33,
-            "Frontal",
-            "PA",
-            1,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            1,
-            f"patient{i}",
-            0,
-        ]
-        train_rows.append(row)
-
-    for i in range(2):
-        img_path = val_dir / f"img{i}.jpg"
-        create_dummy_image(img_path)
-        row = [
-            str(img_path),
-            "Female",
-            29,
-            "Frontal",
-            "AP",
-            1,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            1,
-            f"patientV{i}",
-            0,
-        ]
-        val_rows.append(row)
-
-    pd.DataFrame(train_rows, columns=COLUMNS).to_csv(tmp_path / "train.csv", index=False)
-    pd.DataFrame(val_rows, columns=COLUMNS).to_csv(tmp_path / "val.csv", index=False)
-
+    generate_dummy_chexpert_dataset(base_dir=tmp_path, num_train=20, num_val=10)
     return tmp_path
 
 
@@ -129,10 +61,10 @@ def test_cxr_datamodule(dummy_cxr_dataset):
     dm.setup()
 
     # After setup, datasets should be loaded
-    assert len(dm.data_train) == 3
-    assert len(dm.data_val) == 2
+    assert len(dm.data_train) == 20
+    assert len(dm.data_val) == 10
     # test loader loads val.csv again (per your code)
-    assert len(dm.data_test) == 2
+    assert len(dm.data_test) == 10
 
     train_loader = dm.train_dataloader()
     batch = next(iter(train_loader))
