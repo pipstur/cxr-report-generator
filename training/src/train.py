@@ -10,7 +10,7 @@ from omegaconf import DictConfig
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 import warnings
 
-from src import utils
+from training.src import utils
 
 warnings.filterwarnings("ignore", category=UserWarning, module="torchmetrics.utilities.prints")
 
