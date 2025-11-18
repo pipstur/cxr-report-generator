@@ -6,6 +6,7 @@ from hydra.core.hydra_config import HydraConfig
 from omegaconf import DictConfig, open_dict
 
 from training.src.train import train
+from training.tests.helpers.generate_dummy_data import generate_dummy_chexpert_dataset
 from training.tests.helpers.run_if import RunIf
 
 
@@ -15,6 +16,7 @@ def test_train_fast_dev_run(cfg_train: DictConfig) -> None:
     :param cfg_train: A DictConfig containing a valid training configuration.
     """
     HydraConfig().set_config(cfg_train)
+    generate_dummy_chexpert_dataset(base_dir=cfg_train.data.data_dir, num_train=20, num_val=10)
     with open_dict(cfg_train):
         cfg_train.trainer.fast_dev_run = True
         cfg_train.trainer.accelerator = "cpu"
@@ -42,6 +44,7 @@ def test_train_epoch_gpu_amp(cfg_train: DictConfig) -> None:
     :param cfg_train: A DictConfig containing a valid training configuration.
     """
     HydraConfig().set_config(cfg_train)
+    generate_dummy_chexpert_dataset(base_dir=cfg_train.data.data_dir, num_train=20, num_val=10)
     with open_dict(cfg_train):
         cfg_train.trainer.max_epochs = 1
         cfg_train.trainer.accelerator = "gpu"
@@ -56,6 +59,7 @@ def test_train_epoch_double_val_loop(cfg_train: DictConfig) -> None:
     :param cfg_train: A DictConfig containing a valid training configuration.
     """
     HydraConfig().set_config(cfg_train)
+    generate_dummy_chexpert_dataset(base_dir=cfg_train.data.data_dir, num_train=20, num_val=10)
     with open_dict(cfg_train):
         cfg_train.trainer.max_epochs = 1
         cfg_train.trainer.val_check_interval = 0.5
@@ -69,6 +73,7 @@ def test_train_ddp_sim(cfg_train: DictConfig) -> None:
     :param cfg_train: A DictConfig containing a valid training configuration.
     """
     HydraConfig().set_config(cfg_train)
+    generate_dummy_chexpert_dataset(base_dir=cfg_train.data.data_dir, num_train=20, num_val=10)
     with open_dict(cfg_train):
         cfg_train.trainer.max_epochs = 2
         cfg_train.trainer.accelerator = "cpu"
@@ -88,6 +93,7 @@ def test_train_resume(tmp_path: Path, cfg_train: DictConfig) -> None:
         cfg_train.trainer.max_epochs = 1
 
     HydraConfig().set_config(cfg_train)
+    generate_dummy_chexpert_dataset(base_dir=cfg_train.data.data_dir, num_train=20, num_val=10)
     metric_dict_1, _ = train(cfg_train)
 
     files = os.listdir(tmp_path / "checkpoints")

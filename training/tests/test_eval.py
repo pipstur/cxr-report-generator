@@ -7,6 +7,7 @@ from omegaconf import DictConfig, open_dict
 
 from training.src.eval import evaluate
 from training.src.train import train
+from training.tests.helpers.generate_dummy_data import generate_dummy_chexpert_dataset
 
 
 @pytest.mark.slow
@@ -25,6 +26,7 @@ def test_train_eval(tmp_path: Path, cfg_train: DictConfig, cfg_eval: DictConfig)
         cfg_train.test = True
 
     HydraConfig().set_config(cfg_train)
+    generate_dummy_chexpert_dataset(base_dir=cfg_train.data.data_dir, num_train=20, num_val=10)
     train_metric_dict, _ = train(cfg_train)
 
     assert "last.ckpt" in os.listdir(tmp_path / "checkpoints")
