@@ -26,7 +26,7 @@ def test_train_eval(tmp_path: Path, cfg_train: DictConfig, cfg_eval: DictConfig)
         cfg_train.test = True
 
     HydraConfig().set_config(cfg_train)
-    generate_dummy_chexpert_dataset(base_dir=cfg_train.data.data_dir, num_train=20, num_val=10)
+    generate_dummy_chexpert_dataset(base_dir=cfg_train.data.data_dir)
     cfg_train.trainer.limit_val_batches = 1.0
     train_metric_dict, _ = train(cfg_train)
 

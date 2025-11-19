@@ -41,7 +41,7 @@ def create_dummy_image(path: Path):
 
 @pytest.fixture
 def dummy_cxr_dataset(tmp_path):
-    generate_dummy_chexpert_dataset(base_dir=tmp_path, num_train=20, num_val=10)
+    generate_dummy_chexpert_dataset(base_dir=tmp_path, num_train=128, num_val=128)
     return tmp_path
 
 
@@ -61,10 +61,10 @@ def test_cxr_datamodule(dummy_cxr_dataset):
     dm.setup()
 
     # After setup, datasets should be loaded
-    assert len(dm.data_train) == 20
-    assert len(dm.data_val) == 10
+    assert len(dm.data_train) == 128
+    assert len(dm.data_val) == 128
     # test loader loads val.csv again (per your code)
-    assert len(dm.data_test) == 10
+    assert len(dm.data_test) == 128
 
     train_loader = dm.train_dataloader()
     batch = next(iter(train_loader))
