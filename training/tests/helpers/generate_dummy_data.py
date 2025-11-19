@@ -11,7 +11,7 @@ def generate_dummy_chexpert_dataset(base_dir, num_train=20, num_val=10, img_size
 
     base_dir = cfg_train.data.data_dir
     """
-
+    print(base_dir)
     os.makedirs(base_dir, exist_ok=True)
 
     train_dir = os.path.join(base_dir, "train")
