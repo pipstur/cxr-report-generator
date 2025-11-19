@@ -20,9 +20,18 @@ def test_train_eval(tmp_path: Path, cfg_train: DictConfig, cfg_eval: DictConfig)
     :param cfg_eval: A DictConfig containing a valid evaluation configuration.
     """
     assert str(tmp_path) == cfg_train.paths.output_dir == cfg_eval.paths.output_dir
-
+    tensorboard = {
+        "tensorboard": {
+            "_target_": "lightning.pytorch.loggers.tensorboard.TensorBoardLogger",
+            "save_dir": "${paths.output_dir}/tensorboard/",
+            "name": None,
+            "log_graph": False,
+            "default_hp_metric": True,
+            "prefix": "",
+        }
+    }
     with open_dict(cfg_train):
-        cfg_train.logger = "tensorboard"
+        cfg_train.logger = tensorboard
         cfg_train.data.batch_size = 1
         cfg_train.trainer.max_epochs = 1
         cfg_train.test = True
