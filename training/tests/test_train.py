@@ -20,6 +20,7 @@ def test_train_fast_dev_run(cfg_train: DictConfig) -> None:
     with open_dict(cfg_train):
         cfg_train.trainer.fast_dev_run = True
         cfg_train.trainer.accelerator = "cpu"
+        cfg_train.trainer.limit_val_batches = 1.0
     train(cfg_train)
 
 
@@ -33,6 +34,7 @@ def test_train_fast_dev_run_gpu(cfg_train: DictConfig) -> None:
     with open_dict(cfg_train):
         cfg_train.trainer.fast_dev_run = True
         cfg_train.trainer.accelerator = "gpu"
+        cfg_train.trainer.limit_val_batches = 1.0
     train(cfg_train)
 
 
@@ -49,6 +51,7 @@ def test_train_epoch_gpu_amp(cfg_train: DictConfig) -> None:
         cfg_train.trainer.max_epochs = 1
         cfg_train.trainer.accelerator = "gpu"
         cfg_train.trainer.precision = 16
+        cfg_train.trainer.limit_val_batches = 1.0
     train(cfg_train)
 
 
@@ -63,6 +66,7 @@ def test_train_epoch_double_val_loop(cfg_train: DictConfig) -> None:
     with open_dict(cfg_train):
         cfg_train.trainer.max_epochs = 1
         cfg_train.trainer.val_check_interval = 0.5
+        cfg_train.trainer.limit_val_batches = 1.0
     train(cfg_train)
 
 
@@ -79,6 +83,7 @@ def test_train_ddp_sim(cfg_train: DictConfig) -> None:
         cfg_train.trainer.accelerator = "cpu"
         cfg_train.trainer.devices = 2
         cfg_train.trainer.strategy = "ddp_spawn"
+        cfg_train.trainer.limit_val_batches = 1.0
     train(cfg_train)
 
 
@@ -93,6 +98,7 @@ def test_train_resume(tmp_path: Path, cfg_train: DictConfig) -> None:
         cfg_train.trainer.max_epochs = 1
 
     HydraConfig().set_config(cfg_train)
+    cfg_train.trainer.limit_val_batches = 1.0
     generate_dummy_chexpert_dataset(base_dir=cfg_train.data.data_dir, num_train=20, num_val=10)
     metric_dict_1, _ = train(cfg_train)
 
