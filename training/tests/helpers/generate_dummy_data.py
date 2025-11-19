@@ -5,7 +5,7 @@ import pandas as pd
 from PIL import Image
 
 
-def generate_dummy_chexpert_dataset(base_dir, num_train=20, num_val=10, img_size=(224, 224)):
+def generate_dummy_chexpert_dataset(base_dir, num_train=128, num_val=128, img_size=(224, 224)):
     """
     Generates a dummy CheXpert-like dataset with the required structure.
 
