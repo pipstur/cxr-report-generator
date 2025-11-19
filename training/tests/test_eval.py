@@ -22,6 +22,7 @@ def test_train_eval(tmp_path: Path, cfg_train: DictConfig, cfg_eval: DictConfig)
     assert str(tmp_path) == cfg_train.paths.output_dir == cfg_eval.paths.output_dir
 
     with open_dict(cfg_train):
+        cfg_train.logger = "tensorboard"
         cfg_train.data.batch_size = 1
         cfg_train.trainer.max_epochs = 1
         cfg_train.test = True
