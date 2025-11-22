@@ -44,10 +44,10 @@ def test_train_eval(tmp_path: Path, cfg_train: DictConfig, cfg_eval: DictConfig)
 
     with open_dict(cfg_eval):
         cfg_eval.ckpt_path = str(tmp_path / "checkpoints" / "last.ckpt")
-        cfg_train.logger = tensorboard
-        cfg_train.data.batch_size = 1
-        cfg_train.test = True
-        cfg_train.trainer.limit_val_batches = 1.0
+        cfg_eval.logger = tensorboard
+        cfg_eval.data.batch_size = 1
+        cfg_eval.test = True
+        cfg_eval.trainer.limit_val_batches = 1.0
 
     HydraConfig().set_config(cfg_eval)
     test_metric_dict, _ = evaluate(cfg_eval)
