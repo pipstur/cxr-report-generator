@@ -132,7 +132,7 @@ def test_train_resume(tmp_path: Path, cfg_train: DictConfig) -> None:
 
     with open_dict(cfg_train):
         cfg_train.ckpt_path = str(tmp_path / "checkpoints" / "epoch_000.ckpt")
-        cfg_train.trainer.max_epochs = 2
+        cfg_train.trainer.max_epochs = 3
         cfg_train.logger = tensorboard
         cfg_train.data.batch_size = 1
         cfg_train.trainer.limit_val_batches = 1.0
