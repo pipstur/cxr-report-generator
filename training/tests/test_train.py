@@ -105,6 +105,7 @@ def test_train_ddp_sim(cfg_train: DictConfig) -> None:
         cfg_train.trainer.devices = 2
         cfg_train.trainer.strategy = "ddp_spawn"
         cfg_train.trainer.limit_val_batches = 1.0
+        cfg_train.trainer.limit_train_batches = 1.0
     train(cfg_train)
 
 
@@ -131,7 +132,7 @@ def test_train_resume(tmp_path: Path, cfg_train: DictConfig) -> None:
 
     with open_dict(cfg_train):
         cfg_train.ckpt_path = str(tmp_path / "checkpoints" / "last.ckpt")
-        cfg_train.trainer.max_epochs = 2
+        cfg_train.trainer.max_epochs = 3
         cfg_train.logger = tensorboard
         cfg_train.data.batch_size = 1
         cfg_train.trainer.limit_val_batches = 1.0
