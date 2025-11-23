@@ -2,11 +2,14 @@
 
 from pathlib import Path
 
+import matplotlib
 import pytest
 import rootutils
 from hydra import compose, initialize
 from hydra.core.global_hydra import GlobalHydra
 from omegaconf import DictConfig, open_dict
+
+matplotlib.use("Agg")
 
 
 @pytest.fixture(scope="package")
