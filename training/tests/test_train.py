@@ -121,7 +121,6 @@ def test_train_resume(tmp_path: Path, cfg_train: DictConfig) -> None:
         cfg_train.data.batch_size = 1
         cfg_train.trainer.max_epochs = 1
         cfg_train.trainer.limit_val_batches = 1.0
-        cfg_train.callbacks.model_checkpoint.save_last = False
 
     HydraConfig().set_config(cfg_train)
     generate_dummy_chexpert_dataset(base_dir=cfg_train.data.data_dir)
@@ -131,8 +130,8 @@ def test_train_resume(tmp_path: Path, cfg_train: DictConfig) -> None:
     assert "epoch_000.ckpt" in files
 
     with open_dict(cfg_train):
-        cfg_train.ckpt_path = str(tmp_path / "checkpoints" / "epoch_000.ckpt")
-        cfg_train.trainer.max_epochs = 3
+        cfg_train.ckpt_path = str(tmp_path / "checkpoints" / "last.ckpt")
+        cfg_train.trainer.max_epochs = 2
         cfg_train.logger = tensorboard
         cfg_train.data.batch_size = 1
         cfg_train.trainer.limit_val_batches = 1.0
@@ -143,7 +142,7 @@ def test_train_resume(tmp_path: Path, cfg_train: DictConfig) -> None:
 
     files = os.listdir(tmp_path / "checkpoints")
     assert "epoch_001.ckpt" in files
-    assert "epoch_002.ckpt" not in files
+    assert "last.ckpt" in files
 
     assert metric_dict_1["train/acc"] != metric_dict_2["train/acc"]
     assert metric_dict_1["val/acc"] != metric_dict_2["val/acc"]
