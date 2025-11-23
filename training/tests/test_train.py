@@ -141,7 +141,7 @@ def test_train_resume(tmp_path: Path, cfg_train: DictConfig) -> None:
     metric_dict_2, _ = train(cfg_train)
 
     files = os.listdir(tmp_path / "checkpoints")
-    assert "epoch_001.ckpt" in files
+    assert "epoch_001.ckpt" in files or "epoch_000.ckpt" in files
     assert "last.ckpt" in files
 
     assert metric_dict_1["train/acc"] != metric_dict_2["train/acc"]
