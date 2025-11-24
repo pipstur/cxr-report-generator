@@ -98,7 +98,7 @@ class DatasetPreprocessor:
     def create_folders(self) -> None:
         """Create train/val directories for each fold."""
         for fold in range(self.n_folds):
-            base = os.path.join(self.output_dir, f"fold{fold+1}")
+            base = os.path.join(self.output_dir, f"fold{fold + 1}")
             os.makedirs(os.path.join(base, "train"), exist_ok=True)
             os.makedirs(os.path.join(base, "val"), exist_ok=True)
 
@@ -123,28 +123,30 @@ class DatasetPreprocessor:
         self, df_train_fold: pd.DataFrame, df_val_fold: pd.DataFrame, fold: int
     ) -> None:
         """Process one fold: copy images + save CSVs."""
-        fold_dir = os.path.join(self.output_dir, f"fold{fold+1}")
+        fold_dir = os.path.join(self.output_dir, f"fold{fold + 1}")
         train_dir = os.path.join(fold_dir, "train")
         val_dir = os.path.join(fold_dir, "val")
 
         # --- train ---
-        with ThreadPoolExecutor(max_workers=32) as executor:
+        with ThreadPoolExecutor(max_workers=16) as executor:
             futures = [
                 executor.submit(self.copy_and_resize, row, train_dir)
                 for _, row in df_train_fold.iterrows()
             ]
-            for f in tqdm(as_completed(futures), total=len(futures), desc=f"Fold {fold+1} Train"):
+            for f in tqdm(
+                as_completed(futures), total=len(futures), desc=f"Fold {fold + 1} Train"
+            ):
                 idx, new_path = f.result()
                 if new_path:
                     df_train_fold.at[idx, "Path"] = new_path
 
         # --- val ---
-        with ThreadPoolExecutor(max_workers=32) as executor:
+        with ThreadPoolExecutor(max_workers=16) as executor:
             futures = [
                 executor.submit(self.copy_and_resize, row, val_dir)
                 for _, row in df_val_fold.iterrows()
             ]
-            for f in tqdm(as_completed(futures), total=len(futures), desc=f"Fold {fold+1} Val"):
+            for f in tqdm(as_completed(futures), total=len(futures), desc=f"Fold {fold + 1} Val"):
                 idx, new_path = f.result()
                 if new_path:
                     df_val_fold.at[idx, "Path"] = new_path
