@@ -9,8 +9,10 @@ List all the breaking changes introduced by this pull request.
 
 <!--
 Example:
+
 Name of PR:
 add: data augmentation module; fix: bug in training loop; update: the config structure for data module
+
 Description:
 * add: data augmentation module
 * fix: bug in training loop
