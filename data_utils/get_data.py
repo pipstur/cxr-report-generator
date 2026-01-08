@@ -35,9 +35,9 @@ def main():
     os.makedirs(base_dir, exist_ok=True)
 
     datasets = {
-        "nih-chest-xrays/data": "nih-chest-xrays",
+        # "nih-chest-xrays/data": "nih-chest-xrays",
         "ashery/chexpert": "chexpert",
-        "raddar/padchest-chest-xrays-sample": "padchest",
+        # "raddar/padchest-chest-xrays-sample": "padchest",
     }
 
     for dataset_name, subfolder in datasets.items():
