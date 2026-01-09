@@ -179,13 +179,32 @@ def parse_args() -> argparse.Namespace:
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(description="CheXpert 5-fold preprocessing")
 
-    parser.add_argument("--train-csv", type=str, required=True)
-    parser.add_argument("--val-csv", type=str, required=True)
-    parser.add_argument("--train-dir", type=str, required=True)
-    parser.add_argument("--val-dir", type=str, required=True)
-    parser.add_argument("--output-dir", type=str, required=True)
-    parser.add_argument("--n-folds", type=int, default=5)
-    parser.add_argument("--img-size", nargs=2, metavar=("H", "W"), type=int, default=[224, 224])
+    parser.add_argument(
+        "--train-csv", type=str, required=True, help="Path to the training CSV file"
+    )
+    parser.add_argument(
+        "--val-csv", type=str, required=True, help="Path to the validation CSV file"
+    )
+    parser.add_argument(
+        "--train-dir", type=str, required=True, help="Path to the training images directory"
+    )
+    parser.add_argument(
+        "--val-dir", type=str, required=True, help="Path to the validation images directory"
+    )
+    parser.add_argument(
+        "--output-dir", type=str, required=True, help="Path to the output directory"
+    )
+    parser.add_argument(
+        "--n-folds", type=int, default=5, help="Number of folds for GroupKFold (default: 5)"
+    )
+    parser.add_argument(
+        "--img-size",
+        nargs=2,
+        metavar=("H", "W"),
+        type=int,
+        default=[224, 224],
+        help="Image size after resizing (default: 224 224)",
+    )
 
     return parser.parse_args()
 
