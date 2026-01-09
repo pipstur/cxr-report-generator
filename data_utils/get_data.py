@@ -21,7 +21,7 @@ def cli():
     parser.add_argument(
         "--output-dir",
         type=str,
-        required=True,
+        default="datasets",
         help="Path to the folder where datasets should be downloaded",
     )
     args = parser.parse_args()
@@ -35,7 +35,7 @@ def main():
     os.makedirs(base_dir, exist_ok=True)
 
     datasets = {
-        # "nih-chest-xrays/data": "nih-chest-xrays",
+        "shivapan/nih-x-ray-dataset": "nih-x-ray-dataset",
         "ashery/chexpert": "chexpert",
         # "raddar/padchest-chest-xrays-sample": "padchest",
     }
