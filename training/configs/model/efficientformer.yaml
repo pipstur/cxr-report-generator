@@ -13,4 +13,5 @@ scheduler:
   factor: 0.1
   patience: 10
 
-freeze_backbone: False
+freeze_backbone: True
+grayscale: True

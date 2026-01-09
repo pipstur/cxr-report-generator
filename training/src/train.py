@@ -1,8 +1,10 @@
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import hydra
 import lightning as L
 import rootutils
+import torch
 from lightning import Callback, LightningDataModule, LightningModule, Trainer
 from lightning.pytorch.loggers import Logger
 from omegaconf import DictConfig
@@ -79,6 +81,14 @@ def train(cfg: DictConfig) -> Tuple[Dict[str, Any], Dict[str, Any]]:
 
     # merge train and test metrics
     metric_dict = {**train_metrics, **test_metrics}
+
+    if trainer.checkpoint_callback.best_model_path != "":
+        save_dir = Path(ckpt_path).parent
+        height, width = cfg.data.tile_size
+        channels = 3 if not cfg.model.grayscale else 1
+        input_sample = torch.randn(1, channels, height, width)
+        # saving onnx model for later CPU inference or deployment
+        model.to_onnx(save_dir / "chexpert.onnx", input_sample=input_sample, export_params=True)
 
     return metric_dict, object_dict
 
