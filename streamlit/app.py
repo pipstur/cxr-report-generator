@@ -184,7 +184,7 @@ def generate_report_with_groq(
         Format exactly like this:
 
         IMPRESSION:
-        - Bullet points of key findings
+        - Bullet points of key findings, with confidence of each in brackets
 
         DETAILS:
         - A few short sentences per finding
@@ -199,7 +199,7 @@ def generate_report_with_groq(
     completion = client.chat.completions.create(
         messages=[{"role": "user", "content": prompt}],
         model=model,
-        temperature=1,
+        temperature=0.2,
         max_completion_tokens=1024,
         top_p=1,
     )
