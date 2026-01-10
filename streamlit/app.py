@@ -225,11 +225,9 @@ def main():
         for i, (p, prob) in enumerate(zip(preds, probs)):
             if p:
                 st.markdown(
-                    f"""
-                    **{CLASS_NAMES[i]}**
-                    Probability: **{prob * 100:.1f}%**
-                    _{DIAGNOSIS_EXPLANATIONS.get(CLASS_NAMES[i], "No explanation available.")}_
-                    """
+                    f"""**{CLASS_NAMES[i]}**
+Probability: **{prob * 100:.1f}%**
+_{DIAGNOSIS_EXPLANATIONS.get(CLASS_NAMES[i], "No explanation available.")}_"""
                 )
 
         with st.expander("🧠 Model explanation (Shows the areas relevant to model decisions)"):
