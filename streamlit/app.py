@@ -30,6 +30,11 @@ PROVIDERS = ["CPUExecutionProvider"]
 
 @st.cache_resource
 def load_torch_model(ckpt_path: str) -> EfficientFormer:
+    """Loads the PyTorch model from a checkpoint.
+
+    Returns:
+        EfficientFormer: The loaded model.
+    """
     model = EfficientFormer.load_from_checkpoint(ckpt_path, map_location="cpu")
     model.eval()
     for p in model.parameters():
@@ -39,6 +44,14 @@ def load_torch_model(ckpt_path: str) -> EfficientFormer:
 
 @st.cache_resource
 def load_onnx_models(models_folder: str) -> List[ort.InferenceSession]:
+    """Loads ONNX models to fill the runtime sessions.
+
+    Args:
+        models_folder (str): Path to the folder containing ONNX models.
+
+    Returns:
+        List[ort.InferenceSession]: List of ONNX runtime sessions.
+    """
     sessions = []
     for model_name in os.listdir(models_folder):
         if model_name.endswith(".onnx"):
@@ -48,10 +61,26 @@ def load_onnx_models(models_folder: str) -> List[ort.InferenceSession]:
 
 
 def preprocess_image(image: Image.Image) -> Image.Image:
+    """Resize the image.
+
+    Args:
+        image (Image.Image): Input image from Streamlit platform.
+
+    Returns:
+        Image.Image: Preprocessed image for model ingestion.
+    """
     return image.convert("L").resize(IMAGE_SIZE)
 
 
 def prepare_torch_tensor(image: Image.Image) -> torch.Tensor:
+    """Takes the preprocessed image and turns it into a tensor.
+
+    Args:
+        image (Image.Image): Preprocessed image.
+
+    Returns:
+        torch.Tensor: Image as a tensor representation.
+    """
     arr = np.array(image).astype(np.float32) / 255.0
     return torch.from_numpy(arr).unsqueeze(0).unsqueeze(0)
 
@@ -61,6 +90,15 @@ def prepare_onnx_tensor(image: Image.Image) -> np.ndarray:
 
 
 def predict_image(sessions: List[ort.InferenceSession], tensor: np.ndarray) -> List[np.ndarray]:
+    """Takes the image and runs it through all of the onnxruntime sessions and gets predictions.
+
+    Args:
+        sessions (List[ort.InferenceSession]): List of onnx runtime sessions.
+        tensor (np.ndarray): Image as tensor.
+
+    Returns:
+        List[np.ndarray]: List of predictions.
+    """
     predictions = []
     for session in sessions:
         input_name = session.get_inputs()[0].name
@@ -77,6 +115,15 @@ def safe_sigmoid(x, clip_value=50):
 def predict_multilabel_single(
     logits: np.ndarray, threshold: float = 0.5
 ) -> Tuple[np.ndarray, np.ndarray]:
+    """Does multilabel classification from logits for a single sample.
+
+    Args:
+        logits (np.ndarray): Logits from the model.
+        threshold (float, optional): Threshold for binary classification. Defaults to 0.5.
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray]: Predictions and probabilities.
+    """
     probs = safe_sigmoid(logits)
     preds = probs >= threshold
     return preds, probs
@@ -85,12 +132,32 @@ def predict_multilabel_single(
 def generate_gradcam(
     model: EfficientFormer, tensor: torch.Tensor, target_class: int, target_layer: torch.nn.Module
 ) -> np.ndarray:
+    """Takes the model, input tensor, target class and target layer to generate Grad-CAM.
+
+    Args:
+        model (EfficientFormer): The model.
+        tensor (torch.Tensor): Input tensor.
+        target_class (int): Target class.
+        target_layer (torch.nn.Module): Target layer.
+
+    Returns:
+        np.ndarray: Grad-CAM heatmap.
+    """
     cam = GradCAM(model=model, target_layers=[target_layer])
     grayscale = cam(tensor, targets=[ClassifierOutputTarget(target_class)])
     return grayscale[0]
 
 
 def overlay_cam(image: Image.Image, cam: np.ndarray) -> np.ndarray:
+    """Overlays the Grad-CAM heatmap on the original image.
+
+    Args:
+        image (Image.Image): Original image.
+        cam (np.ndarray): Grad-CAM heatmap.
+
+    Returns:
+        np.ndarray: Overlayed image.
+    """
     img_np = np.array(image.resize(IMAGE_SIZE)) / 255.0
     if img_np.ndim == 2:
         img_np = np.stack([img_np] * 3, axis=-1)
@@ -100,7 +167,7 @@ def overlay_cam(image: Image.Image, cam: np.ndarray) -> np.ndarray:
 def generate_report_with_groq(
     probs: np.ndarray, model: str = "llama-3.1-8b-instant"
 ) -> str | None:
-    print(probs)
+    """Generates a radiology report using Groq API based on the predicted probabilities."""
     client = Groq()
     class_info = [f"{CLASS_NAMES[i]} (Probability: {prob:.2f})" for i, prob in enumerate(probs)]
     prompt = f"""
@@ -120,7 +187,7 @@ def generate_report_with_groq(
         - Bullet points of key findings
 
         DETAILS:
-        - One short sentence per finding
+        - A few short sentences per finding
 
         DISCLAIMER:
         - One sentence stating this is an AI-assisted result
