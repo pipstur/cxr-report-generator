@@ -38,3 +38,8 @@ onnxruntime==1.23.2
 streamlit==1.52.2
 grad-cam==1.5.5
 groq==1.0.0
+
+black==24.10.0
+isort==5.13.2
+flake8==7.1.1
+pre-commit==2.13.0
