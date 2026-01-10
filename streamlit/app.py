@@ -19,27 +19,12 @@ from pytorch_grad_cam.utils.image import show_cam_on_image
 from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
 
 import streamlit as st
+from data_utils import CLASS_NAMES, DIAGNOSIS_EXPLANATIONS
 from training.src.models.efficientformer import EfficientFormer
 
 MODEL_PATH_CKPT = "models/epoch_001.ckpt"
 MODEL_FOLDER_ONNX = "models/"
 IMAGE_SIZE = (224, 224)
-CLASS_NAMES = [
-    "No Finding",
-    "Enlarged Cardiomediastinum",
-    "Cardiomegaly",
-    "Lung Opacity",
-    "Lung Lesion",
-    "Edema",
-    "Consolidation",
-    "Pneumonia",
-    "Atelectasis",
-    "Pneumothorax",
-    "Pleural Effusion",
-    "Pleural Other",
-    "Fracture",
-    "Support Devices",
-]
 PROVIDERS = ["CPUExecutionProvider"]
 
 
@@ -118,12 +103,31 @@ def generate_report_with_groq(
     print(probs)
     client = Groq()
     class_info = [f"{CLASS_NAMES[i]} (Probability: {prob:.2f})" for i, prob in enumerate(probs)]
-    prompt = (
-        "You are a radiology assistant. Given the following model predictions for a chest X-ray, "
-        "write a concise, human-readable report. Include the most important findings, "
-        "highlight any serious conditions, and explain in plain language if possible.\n\n"
-        f"Predictions:\n{class_info}"
-    )
+    prompt = f"""
+        You are a radiology assistant.
+
+        Write a short, structured chest X-ray report using the predictions below.
+
+        Rules:
+        - Use simple, non-technical language
+        - Do NOT invent findings
+        - Mention only findings with probability ≥ 0.5
+        - Be concise
+
+        Format exactly like this:
+
+        IMPRESSION:
+        - Bullet points of key findings
+
+        DETAILS:
+        - One short sentence per finding
+
+        DISCLAIMER:
+        - One sentence stating this is an AI-assisted result
+
+        Predictions:
+        {class_info}
+    """
 
     completion = client.chat.completions.create(
         messages=[{"role": "user", "content": prompt}],
@@ -136,9 +140,9 @@ def generate_report_with_groq(
 
 
 def main():
-    st.title("🔬 14-Class Image Classification with Grad-CAM")
+    st.title("Chest X-ray AI Assistant")
+    st.caption("This tool is for research and decision support only.")
     uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
-    show_explanation = st.checkbox("Show Grad-CAM explanation")
 
     if uploaded_file:
         image = Image.open(uploaded_file).convert("RGB")
@@ -149,12 +153,19 @@ def main():
         logits = predict_image(sessions, onnx_tensor)[0]
         preds, probs = predict_multilabel_single(logits, threshold=0.5)
 
-        st.write("### Predictions")
+        st.write("### Findings")
+
         for i, (p, prob) in enumerate(zip(preds, probs)):
             if p:
-                st.write(f"- **{CLASS_NAMES[i]}**: {prob * 100:.2f}%")
+                st.markdown(
+                    f"""
+                    **{CLASS_NAMES[i]}**
+                    Probability: **{prob*100:.1f}%**
+                    _{DIAGNOSIS_EXPLANATIONS.get(CLASS_NAMES[i], "No explanation available.")}_
+                    """
+                )
 
-        if show_explanation:
+        with st.expander("🧠 Model explanation (Shows the areas relevant to model decisions)"):
             torch_model = load_torch_model(MODEL_PATH_CKPT)
             torch_tensor = prepare_torch_tensor(preprocess_image(image))
             target_layer = torch_model.feature_extractor.stages[3].blocks[-1].token_mixer.proj.conv
@@ -172,8 +183,8 @@ def main():
         if st.button("Generate Radiology Report"):
             with st.spinner("Generating report..."):
                 report = generate_report_with_groq(probs)
-            st.write("### Radiology Report")
-            st.text(report)
+            st.markdown("### Radiology Report")
+            st.markdown(report)
 
 
 if __name__ == "__main__":
