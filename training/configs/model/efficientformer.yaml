@@ -15,3 +15,5 @@ scheduler:
 
 freeze_backbone: False
 grayscale: True
+
+num_classes: 14
