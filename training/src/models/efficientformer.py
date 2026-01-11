@@ -14,9 +14,9 @@ class EfficientFormer(Model):
         scheduler: torch.optim.lr_scheduler,
         freeze_backbone: bool,
         grayscale: bool,
+        num_classes: int,
     ):
-        super().__init__()
-
+        super().__init__(num_classes=num_classes)
         self.criterion = nn.BCEWithLogitsLoss()
 
         backbone = timm.create_model("efficientformerv2_s0", pretrained=True, num_classes=0)

@@ -15,9 +15,9 @@ class MobileNetV4(Model):
         scheduler: torch.optim.lr_scheduler,
         freeze_backbone: bool,
         grayscale: bool,
+        num_classes: int,
     ):
-        super().__init__()
-
+        super().__init__(num_classes=num_classes)
         self.criterion = nn.BCEWithLogitsLoss()
 
         backbone = timm.create_model(
