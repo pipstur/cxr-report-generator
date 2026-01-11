@@ -1,7 +1,7 @@
 _target_: training.src.data.datamodule.CXRDataModule
 data_dir: ${paths.data_dir}chexpert/5fold_study1/fold1/
 batch_size: 128
-num_workers: 12
+num_workers: 6
 tile_size: [224, 224]
 pin_memory: True
 train_augs: True

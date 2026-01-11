@@ -12,7 +12,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 source ~/.bashrc
 pip install --upgrade pip
 # pre-commit install # optionally, if you plan to push code
-uv pip install -r training/requirements.txt
+uv pip install --extra-index-url https://download.pytorch.org/whl/cu126 --index-strategy unsafe-best-match -r training/requirements.txt
 
 sudo chmod 700 ~/.ssh && sudo chmod 600 ~/.ssh/*
 mkdir -p ~/.ssh
