@@ -19,7 +19,7 @@ The project is intended to be run in a Python environment (3.10). Follow these s
    source venv/bin/activate  # On Windows use `venv\Scripts\activate
    curl -LsSf https://astral.sh/uv/install.sh | sh
    source ~/.bashrc
-   uv pip install -r training/requirements.txt
+   uv pip install --extra-index-url https://download.pytorch.org/whl/cu126 --index-strategy unsafe-best-match -r training/requirements.txt
    ```
 3. Download the models using the provided script:
    ```bash

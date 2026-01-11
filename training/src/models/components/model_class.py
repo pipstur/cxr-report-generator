@@ -43,13 +43,13 @@ class Model(LightningModule):
         self,
         optimizer: torch.optim.Optimizer = None,
         scheduler: torch.optim.lr_scheduler = None,
+        num_classes: int = 14,
     ):
         super().__init__()
-
+        self.num_classes = num_classes
         # this line allows to access init params with 'self.hparams' attribute
         # also ensures init params will be stored in ckpt
         self.save_hyperparameters(logger=False, ignore=["net"])
-        self.num_classes = 14
 
         # metric objects for calculating and averaging accuracy across batches
         self.train_acc = MultilabelAccuracy(num_labels=self.num_classes, average="macro")

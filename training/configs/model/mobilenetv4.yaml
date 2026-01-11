@@ -1,0 +1,19 @@
+_target_: training.src.models.mobilenetv4.MobileNetV4
+
+optimizer:
+  _target_: torch.optim.Adam
+  _partial_: True
+  lr: 0.001
+  weight_decay: 0.0
+
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  _partial_: True
+  mode: min
+  factor: 0.1
+  patience: 10
+
+freeze_backbone: False
+grayscale: True
+
+num_classes: 14
