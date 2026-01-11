@@ -6,6 +6,8 @@ name: Code Quality Main
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main, "release/*", "dev"]
 
 jobs:
   code-quality:
@@ -19,4 +21,4 @@ jobs:
         uses: actions/setup-python@v2
 
       - name: Run pre-commits
-        uses: pre-commit/action@v2.0.3
+        uses: pre-commit/action@v3.0.1
