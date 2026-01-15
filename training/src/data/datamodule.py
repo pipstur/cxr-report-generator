@@ -57,6 +57,7 @@ class CXRDataModule(LightningDataModule):
         pin_memory: bool = False,
         train_augs: bool = False,
         val_augs: bool = False,
+        label_selection: List[str] = ["all"],
     ) -> None:
         """Initialize a `CXRDataModule`.
 
@@ -73,6 +74,7 @@ class CXRDataModule(LightningDataModule):
 
         self.data_dir = data_dir
         self.dirs = dirs
+        self.label_selection = label_selection
 
         augmentations = [
             T.RandomRotation(15),
@@ -103,7 +105,7 @@ class CXRDataModule(LightningDataModule):
 
         :return: The number of CXR classes.
         """
-        return 14
+        return len(self.label_selection)
 
     def prepare_data(self) -> None:
         """Download data if needed. Lightning ensures that `self.prepare_data()` is called only
@@ -128,14 +130,17 @@ class CXRDataModule(LightningDataModule):
         self.data_train = CXRDataset(
             csv_file=f"{self.data_dir}/train.csv",
             transform=self.train_transforms,
+            label_selection=self.label_selection,
         )
         self.data_val = CXRDataset(
             csv_file=f"{self.data_dir}/val.csv",
             transform=self.val_transforms,
+            label_selection=self.label_selection,
         )
         self.data_test = CXRDataset(
             csv_file=f"{self.data_dir}/val.csv",
             transform=self.test_transforms,
+            label_selection=self.label_selection,
         )
 
     def train_dataloader(self) -> DataLoader[Any]:
