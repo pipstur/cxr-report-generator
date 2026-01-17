@@ -326,7 +326,7 @@ class Model(LightningModule):
             )
             plt.close(fig)
         else:
-            classes = ["Present", "Absent"]
+            classes = ["Absent", "Present"]
             confusion_matrix = self.con_mat.compute().cpu().numpy()
             sums = np.sum(confusion_matrix, axis=1, keepdims=True)
             sums[sums == 0] = 1
