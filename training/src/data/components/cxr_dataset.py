@@ -1,3 +1,5 @@
+from typing import List
+
 import pandas as pd
 import torch
 from PIL import Image
@@ -5,14 +7,16 @@ from torch.utils.data import Dataset
 
 
 class CXRDataset(Dataset):
-    def __init__(self, csv_file, transform=None):
+    def __init__(self, csv_file, label_selection: List[str] = ["all"], transform=None):
         self.df = pd.read_csv(csv_file)
         self.transform = transform
-        self.label_cols = self.df.columns.difference(
-            ["Path", "Sex", "Age", "Frontal/Lateral", "AP/PA", "patient_id", "fold"]
+        self.label_cols = (
+            self.df.columns.difference(
+                ["Path", "Sex", "Age", "Frontal/Lateral", "AP/PA", "patient_id", "fold"]
+            )
+            if label_selection[0] == "all"
+            else label_selection
         )
-        # map -1 to 0
-        self.df[self.label_cols] = self.df[self.label_cols].replace(-1, 0).astype("float32")
 
     def __len__(self):
         return len(self.df)

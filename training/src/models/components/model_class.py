@@ -9,7 +9,18 @@ import torch
 import torchvision
 from lightning import LightningModule
 from PIL import Image
-from torchmetrics import MaxMetric, MeanMetric
+from torchmetrics import (
+    AUROC,
+    Accuracy,
+    AveragePrecision,
+    ConfusionMatrix,
+    F1Score,
+    MaxMetric,
+    MeanMetric,
+    Precision,
+    Recall,
+    Specificity,
+)
 from torchmetrics.classification import (
     MultilabelAccuracy,
     MultilabelAUROC,
@@ -51,42 +62,85 @@ class Model(LightningModule):
         # also ensures init params will be stored in ckpt
         self.save_hyperparameters(logger=False, ignore=["net"])
 
-        # metric objects for calculating and averaging accuracy across batches
-        self.train_acc = MultilabelAccuracy(num_labels=self.num_classes, average="macro")
-        self.val_acc = MultilabelAccuracy(num_labels=self.num_classes, average="macro")
-        self.test_acc = MultilabelAccuracy(num_labels=self.num_classes, average="macro")
+        # Treat this as a multilabel problem if number of classes is 2, else put it into binary
+        if num_classes >= 2:
+            self.train_acc = MultilabelAccuracy(num_labels=self.num_classes, average="macro")
+            self.val_acc = MultilabelAccuracy(num_labels=self.num_classes, average="macro")
+            self.test_acc = MultilabelAccuracy(num_labels=self.num_classes, average="macro")
 
-        self.train_spec = MultilabelSpecificity(num_labels=self.num_classes, average="macro")
-        self.val_spec = MultilabelSpecificity(num_labels=self.num_classes, average="macro")
-        self.test_spec = MultilabelSpecificity(num_labels=self.num_classes, average="macro")
+            self.train_spec = MultilabelSpecificity(num_labels=self.num_classes, average="macro")
+            self.val_spec = MultilabelSpecificity(num_labels=self.num_classes, average="macro")
+            self.test_spec = MultilabelSpecificity(num_labels=self.num_classes, average="macro")
 
-        self.train_f1 = MultilabelF1Score(num_labels=self.num_classes, average="macro")
-        self.val_f1 = MultilabelF1Score(num_labels=self.num_classes, average="macro")
-        self.test_f1 = MultilabelF1Score(num_labels=self.num_classes, average="macro")
+            self.train_f1 = MultilabelF1Score(num_labels=self.num_classes, average="macro")
+            self.val_f1 = MultilabelF1Score(num_labels=self.num_classes, average="macro")
+            self.test_f1 = MultilabelF1Score(num_labels=self.num_classes, average="macro")
 
-        self.train_recall = MultilabelRecall(num_labels=self.num_classes, average="macro")
-        self.val_recall = MultilabelRecall(num_labels=self.num_classes, average="macro")
-        self.test_recall = MultilabelRecall(num_labels=self.num_classes, average="macro")
+            self.train_recall = MultilabelRecall(num_labels=self.num_classes, average="macro")
+            self.val_recall = MultilabelRecall(num_labels=self.num_classes, average="macro")
+            self.test_recall = MultilabelRecall(num_labels=self.num_classes, average="macro")
 
-        self.train_precision = MultilabelPrecision(num_labels=self.num_classes, average="macro")
-        self.val_precision = MultilabelPrecision(num_labels=self.num_classes, average="macro")
-        self.test_precision = MultilabelPrecision(num_labels=self.num_classes, average="macro")
+            self.train_precision = MultilabelPrecision(
+                num_labels=self.num_classes, average="macro"
+            )
+            self.val_precision = MultilabelPrecision(num_labels=self.num_classes, average="macro")
+            self.test_precision = MultilabelPrecision(num_labels=self.num_classes, average="macro")
 
-        self.train_roc_auc = MultilabelAUROC(num_labels=self.num_classes, average="macro")
-        self.val_roc_auc = MultilabelAUROC(num_labels=self.num_classes, average="macro")
-        self.test_roc_auc = MultilabelAUROC(num_labels=self.num_classes, average="macro")
+            self.train_roc_auc = MultilabelAUROC(num_labels=self.num_classes, average="macro")
+            self.val_roc_auc = MultilabelAUROC(num_labels=self.num_classes, average="macro")
+            self.test_roc_auc = MultilabelAUROC(num_labels=self.num_classes, average="macro")
 
-        self.train_auprc = MultilabelAveragePrecision(num_labels=self.num_classes, average="macro")
-        self.val_auprc = MultilabelAveragePrecision(num_labels=self.num_classes, average="macro")
-        self.test_auprc = MultilabelAveragePrecision(num_labels=self.num_classes, average="macro")
+            self.train_auprc = MultilabelAveragePrecision(
+                num_labels=self.num_classes, average="macro"
+            )
+            self.val_auprc = MultilabelAveragePrecision(
+                num_labels=self.num_classes, average="macro"
+            )
+            self.test_auprc = MultilabelAveragePrecision(
+                num_labels=self.num_classes, average="macro"
+            )
 
-        # for averaging loss across batches
+            self.con_mat = MultilabelConfusionMatrix(num_labels=self.num_classes)
+
+        elif num_classes == 1:
+            # if number of classes is 1 treat it as binary classification (present / absent)
+            self.train_acc = Accuracy(task="binary")
+            self.val_acc = Accuracy(task="binary")
+            self.test_acc = Accuracy(task="binary")
+
+            self.train_spec = Specificity(task="binary")
+            self.val_spec = Specificity(task="binary")
+            self.test_spec = Specificity(task="binary")
+
+            self.train_f1 = F1Score(task="binary")
+            self.val_f1 = F1Score(task="binary")
+            self.test_f1 = F1Score(task="binary")
+
+            self.train_recall = Recall(task="binary")
+            self.val_recall = Recall(task="binary")
+            self.test_recall = Recall(task="binary")
+
+            self.train_precision = Precision(task="binary")
+            self.val_precision = Precision(task="binary")
+            self.test_precision = Precision(task="binary")
+
+            self.train_roc_auc = AUROC(task="binary")
+            self.val_roc_auc = AUROC(task="binary")
+            self.test_roc_auc = AUROC(task="binary")
+
+            self.train_auprc = AveragePrecision(task="binary")
+            self.val_auprc = AveragePrecision(task="binary")
+            self.test_auprc = AveragePrecision(task="binary")
+
+            self.con_mat = ConfusionMatrix(task="binary", num_classes=self.num_classes)
+        else:
+            raise ValueError("Invalid number of classes")
+
         self.train_loss = MeanMetric()
         self.val_loss = MeanMetric()
         self.test_loss = MeanMetric()
 
-        self.con_mat = MultilabelConfusionMatrix(num_labels=self.num_classes)
-        # for tracking best so far validation accuracy
+        # for tracking best so far validation ROC AUC
         self.val_roc_auc_best = MaxMetric()
         self.feature_extractor = None
         self.classifier = None
@@ -101,7 +155,7 @@ class Model(LightningModule):
 
     def on_train_start(self):
         # by default lightning executes validation step sanity checks before training starts,
-        # so we need to make sure val_roc_auc_best doesn't store accuracy from these checks
+        # so we need to make sure val_roc_auc_best doesn't store ROC AUC from these checks
         self.val_roc_auc_best.reset()
 
     def model_step(self, batch):
@@ -206,70 +260,113 @@ class Model(LightningModule):
         return {"preds": preds, "targets": targets}
 
     def on_test_epoch_end(self):
-        classes = [
-            "No Finding",
-            "Enlarged Cardiomediastinum",
-            "Cardiomegaly",
-            "Lung Opacity",
-            "Lung Lesion",
-            "Edema",
-            "Consolidation",
-            "Pneumonia",
-            "Atelectasis",
-            "Pneumothorax",
-            "Pleural Effusion",
-            "Pleural Other",
-            "Fracture",
-            "Support Devices",
-        ]
+        if self.num_classes >= 2:
+            classes = [
+                "No Finding",
+                "Enlarged Cardiomediastinum",
+                "Cardiomegaly",
+                "Lung Opacity",
+                "Lung Lesion",
+                "Edema",
+                "Consolidation",
+                "Pneumonia",
+                "Atelectasis",
+                "Pneumothorax",
+                "Pleural Effusion",
+                "Pleural Other",
+                "Fracture",
+                "Support Devices",
+            ]
 
-        n_classes = len(classes)
-        n_cols = 4
-        n_rows = (n_classes + n_cols - 1) // n_cols
+            n_classes = len(classes)
+            n_cols = 4
+            n_rows = (n_classes + n_cols - 1) // n_cols
 
-        # Uzmi matricu konfuzije iz torchmetrics
-        cm_all = self.con_mat.compute().cpu().numpy()  # shape: (num_classes, 2, 2)
+            # Uzmi matricu konfuzije iz torchmetrics
+            cm_all = self.con_mat.compute().cpu().numpy()  # shape: (num_classes, 2, 2)
 
-        fig, axes = plt.subplots(n_rows, n_cols, figsize=(4 * n_cols, 4 * n_rows))
-        axes = axes.flatten()
+            fig, axes = plt.subplots(n_rows, n_cols, figsize=(4 * n_cols, 4 * n_rows))
+            axes = axes.flatten()
 
-        for i, cls in enumerate(classes):
-            cm = cm_all[i]  # 2x2 za klasu i
-            row_sums = cm.sum(axis=1, keepdims=True)
-            row_sums[row_sums == 0] = 1  # izbegni deljenje nulom
-            cm_percent = cm / row_sums * 100
-            annot = np.array(
+            for i, cls in enumerate(classes):
+                cm = cm_all[i]  # 2x2 za klasu i
+                row_sums = cm.sum(axis=1, keepdims=True)
+                row_sums[row_sums == 0] = 1  # izbegni deljenje nulom
+                cm_percent = cm / row_sums * 100
+                annot = np.array(
+                    [
+                        [f"{int(cm[r, c])} ({cm_percent[r, c]:.1f}%)" for c in range(2)]
+                        for r in range(2)
+                    ]
+                )
+
+                df_cm = pd.DataFrame(
+                    cm_percent,
+                    index=["Actual Absent", "Actual Present"],
+                    columns=["Predicted Absent", "Predicted Present"],
+                )
+                sns.heatmap(df_cm, annot=annot, fmt="", cmap="Blues", ax=axes[i], vmin=0, vmax=100)
+                axes[i].set_title(cls)
+                axes[i].set_xlabel("")
+                axes[i].set_ylabel("")
+
+            # Sakrij prazne subplotove ako ih ima
+            for j in range(n_classes, len(axes)):
+                axes[j].axis("off")
+
+            plt.tight_layout()
+
+            buf = io.BytesIO()
+            plt.savefig(buf, format="jpeg", bbox_inches="tight")
+            buf.seek(0)
+            cm_image = Image.open(buf)
+            cm_image = torchvision.transforms.ToTensor()(cm_image)
+            self.logger.experiment.add_image(
+                "confusion_matrix_grid", cm_image, global_step=self.current_epoch
+            )
+            plt.close(fig)
+        else:
+            classes = ["Absent", "Present"]
+            confusion_matrix = self.con_mat.compute().cpu().numpy()
+            sums = np.sum(confusion_matrix, axis=1, keepdims=True)
+            sums[sums == 0] = 1
+
+            normalized_cm = confusion_matrix / sums
+            normalized_cm[sums.squeeze() == 1, :] = 0
+
+            formatted_cm = np.array(
                 [
-                    [f"{int(cm[r, c])} ({cm_percent[r, c]:.1f}%)" for c in range(2)]
-                    for r in range(2)
+                    [
+                        f"{int(confusion_matrix[i, j])} ({normalized_cm[i, j] * 100:.1f}%)"
+                        for j in range(len(classes))
+                    ]
+                    for i in range(len(classes))
                 ]
             )
 
             df_cm = pd.DataFrame(
-                cm_percent,
-                index=["Actual Absent", "Actual Present"],
-                columns=["Predicted Absent", "Predicted Present"],
+                normalized_cm * 100,
+                index=[f"Actual {cls}" for cls in classes],
+                columns=[f"Predicted {cls}" for cls in classes],
             )
-            sns.heatmap(df_cm, annot=annot, fmt="", cmap="Blues", ax=axes[i], vmin=0, vmax=100)
-            axes[i].set_title(cls)
-            axes[i].set_xlabel("")
-            axes[i].set_ylabel("")
 
-        # Sakrij prazne subplotove ako ih ima
-        for j in range(n_classes, len(axes)):
-            axes[j].axis("off")
+            plt.figure(figsize=(12, 7))
+            sns.heatmap(
+                df_cm, annot=formatted_cm, fmt="", cmap="Blues", cbar=True, vmin=0, vmax=100
+            )
+            plt.xlabel("Predicted")
+            plt.ylabel("Actual")
+            plt.title("Confusion Matrix (Counts & %)")
 
-        plt.tight_layout()
+            buf = io.BytesIO()
+            plt.savefig(buf, format="jpeg", bbox_inches="tight")
+            buf.seek(0)
 
-        buf = io.BytesIO()
-        plt.savefig(buf, format="jpeg", bbox_inches="tight")
-        buf.seek(0)
-        cm_image = Image.open(buf)
-        cm_image = torchvision.transforms.ToTensor()(cm_image)
-        self.logger.experiment.add_image(
-            "confusion_matrix_grid", cm_image, global_step=self.current_epoch
-        )
-        plt.close(fig)
+            cm_image = Image.open(buf)
+            cm_image = torchvision.transforms.ToTensor()(cm_image)
+            self.logger.experiment.add_image(
+                "confusion_matrix", cm_image, global_step=self.current_epoch
+            )
 
     def configure_optimizers(self):
         """Choose what optimizers and learning-rate schedulers to use in your optimization.
