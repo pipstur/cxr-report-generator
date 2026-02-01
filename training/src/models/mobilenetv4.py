@@ -22,7 +22,7 @@ class MobileNetV4(Model):
         self.criterion = BinaryFocalLoss()
 
         backbone = timm.create_model(
-            "mobilenetv4_conv_small_050.e3000_r224_in1k", pretrained=True, num_classes=0
+            "mobilenetv4_hybrid_medium.e500_r224_in1k", pretrained=True, num_classes=0
         )
         if grayscale:
             conv = backbone.conv_stem
