@@ -10,7 +10,7 @@ def generate_dummy_chexpert_dataset(
     base_dir: str,
     num_train: int = 128,
     num_val: int = 128,
-    num_test: int = 64,
+    num_test: int = 128,
     img_size: Tuple[int, int] = (224, 224),
 ) -> None:
     os.makedirs(base_dir, exist_ok=True)
