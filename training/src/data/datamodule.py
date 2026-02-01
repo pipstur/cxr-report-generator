@@ -57,6 +57,8 @@ class CXRDataModule(LightningDataModule):
         pin_memory: bool = False,
         train_augs: bool = False,
         val_augs: bool = False,
+        dataset: str = "chexpert",
+        label_selection: List[str] = ["all"],
     ) -> None:
         """Initialize a `CXRDataModule`.
 
@@ -73,22 +75,23 @@ class CXRDataModule(LightningDataModule):
 
         self.data_dir = data_dir
         self.dirs = dirs
+        self.label_selection = label_selection
+        self.dataset = dataset
 
         augmentations = [
-            T.RandomRotation(15),
-            T.RandomHorizontalFlip(p=0.5),
+            T.RandomRotation(degrees=5),
             T.RandomAdjustSharpness(sharpness_factor=2, p=0.5),
-            T.RandomPerspective(distortion_scale=0.2, p=0.5),
+            # GaussianNoise(),
         ]
 
         base_transforms = [T.ToTensor(), T.Normalize(mean=[0.5], std=[0.5])]
 
         self.train_transforms = T.Compose(
-            augmentations + base_transforms if train_augs else base_transforms
+            base_transforms + augmentations if train_augs else base_transforms
         )
 
         self.val_transforms = T.Compose(
-            augmentations + base_transforms if val_augs else base_transforms
+            base_transforms + augmentations if val_augs else base_transforms
         )
 
         self.test_transforms = T.Compose(base_transforms)
@@ -103,7 +106,7 @@ class CXRDataModule(LightningDataModule):
 
         :return: The number of CXR classes.
         """
-        return 14
+        return len(self.label_selection)
 
     def prepare_data(self) -> None:
         """Download data if needed. Lightning ensures that `self.prepare_data()` is called only
@@ -128,14 +131,20 @@ class CXRDataModule(LightningDataModule):
         self.data_train = CXRDataset(
             csv_file=f"{self.data_dir}/train.csv",
             transform=self.train_transforms,
+            dataset=self.dataset,
+            label_selection=self.label_selection,
         )
         self.data_val = CXRDataset(
             csv_file=f"{self.data_dir}/val.csv",
             transform=self.val_transforms,
+            dataset=self.dataset,
+            label_selection=self.label_selection,
         )
         self.data_test = CXRDataset(
-            csv_file=f"{self.data_dir}/val.csv",
+            csv_file=f"{self.data_dir}/../test/test.csv",
             transform=self.test_transforms,
+            dataset=self.dataset,
+            label_selection=self.label_selection,
         )
 
     def train_dataloader(self) -> DataLoader[Any]:

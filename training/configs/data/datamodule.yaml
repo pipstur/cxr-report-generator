@@ -6,3 +6,8 @@ tile_size: [224, 224]
 pin_memory: True
 train_augs: True
 val_augs: False
+dataset: "chexpert" # choice: chexpert, nih
+
+# options for nih: all, Atelectasis, Cardiomegaly, Consolidation, Edema, Effusion, Emphysema, Fibrosis, Hernia, Infiltration, Mass, Nodule, Pleural_Thickening, Pneumonia, Pneumothorax
+# options for chexpert: all, No Finding, Enlarged Cardiomediastinum, Cardiomegaly, Lung Opacity, Lung Lesion, Edema, Consolidation, Pneumonia, Atelectasis, Pneumothorax, Pleural Effusion, Pleural Other, Fracture, Support Devices
+label_selection: ["all"]

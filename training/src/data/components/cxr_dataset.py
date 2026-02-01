@@ -1,3 +1,5 @@
+from typing import List
+
 import pandas as pd
 import torch
 from PIL import Image
@@ -5,14 +7,41 @@ from torch.utils.data import Dataset
 
 
 class CXRDataset(Dataset):
-    def __init__(self, csv_file, transform=None):
+    def __init__(
+        self, csv_file, dataset: str, label_selection: List[str] = ["all"], transform=None
+    ):
         self.df = pd.read_csv(csv_file)
         self.transform = transform
-        self.label_cols = self.df.columns.difference(
-            ["Path", "Sex", "Age", "Frontal/Lateral", "AP/PA", "patient_id", "fold"]
-        )
-        # map -1 to 0
-        self.df[self.label_cols] = self.df[self.label_cols].replace(-1, 0).astype("float32")
+        if dataset.lower() == "chexpert":
+            self.label_cols = (
+                self.df.columns.difference(
+                    ["Path", "Sex", "Age", "Frontal/Lateral", "AP/PA", "patient_id", "fold"]
+                )
+                if label_selection[0] == "all"
+                else label_selection
+            )
+        elif dataset.lower() == "nih":
+            self.label_cols = (
+                self.df.columns.difference(
+                    [
+                        "Image Index",
+                        "Finding Labels",
+                        "Follow-up #",
+                        "Patient ID",
+                        "Patient Age",
+                        "Patient Gender",
+                        "View Position",
+                        "OriginalImage[Width,Height]",
+                        "OriginalImagePixelSpacing[x,y]",
+                        "Unnamed: 11",
+                        "fold",
+                    ]
+                )
+                if label_selection[0] == "all"
+                else label_selection
+            )
+        else:
+            raise ValueError(f"Unsupported dataset: {dataset}. Choose 'chexpert' or 'nih'.")
 
     def __len__(self):
         return len(self.df)

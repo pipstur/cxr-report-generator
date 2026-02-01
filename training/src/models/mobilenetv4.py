@@ -3,6 +3,7 @@ import torch
 from timm.models.helpers import adapt_input_conv
 from torch import nn
 
+from training.src.models.components.loss_functions import BinaryFocalLoss
 from training.src.models.components.model_class import Model
 
 torch.use_deterministic_algorithms(True, warn_only=True)
@@ -18,10 +19,10 @@ class MobileNetV4(Model):
         num_classes: int,
     ):
         super().__init__(num_classes=num_classes)
-        self.criterion = nn.BCEWithLogitsLoss()
+        self.criterion = BinaryFocalLoss()
 
         backbone = timm.create_model(
-            "mobilenetv4_conv_small_050.e3000_r224_in1k", pretrained=True, num_classes=0
+            "mobilenetv4_hybrid_medium.e500_r224_in1k", pretrained=True, num_classes=0
         )
         if grayscale:
             conv = backbone.conv_stem
