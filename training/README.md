@@ -26,7 +26,7 @@ python data_utils/get_data.py --output-dir ./datasets/
 ```
 2. Run the dataset preparation:
 ```bash
-usage: data_prep.py [-h] --train-csv TRAIN_CSV --val-csv VAL_CSV --train-dir TRAIN_DIR --val-dir VAL_DIR --output-dir OUTPUT_DIR [--n-folds N_FOLDS] [--img-size H W]
+usage: data_prep_chexpert.py [-h] --train-csv TRAIN_CSV --val-csv VAL_CSV --train-dir TRAIN_DIR --val-dir VAL_DIR --output-dir OUTPUT_DIR [--n-folds N_FOLDS] [--img-size H W]
 
 CheXpert 5-fold preprocessing
 
@@ -45,7 +45,7 @@ options:
 ```
 Example usage:
 ```bash
-python data_utils/data_prep.py \
+python data_utils/data_prep_chexpert.py \
 --train-csv ./datasets/chexpert/1/train.csv \
 --val-csv ./datasets/chexpert/1/valid.csv \
 --train-dir ./datasets/chexpert/1/train \
@@ -53,6 +53,18 @@ python data_utils/data_prep.py \
 --output-dir ./datasets/train_5fold_study1/ \
 --n-folds 5 \
 --img-size 224 224
+```
+
+3. Or for NIH dataset:
+```bash
+python data_utils/data_prep_nih.py \
+--train-dir datasets/nih-x-ray-dataset/2/Classified_image_new/Classified_image_new/Classified_image \
+--test-dir datasets/nih-x-ray-dataset/2/Classified_image_new/Classified_image_new/test_data/ \
+--csv-path datasets/nih-x-ray-dataset/2/Data_Entry_2017.csv \
+--output-dir datasets/test/ \
+--n-folds 5 \
+--img-size 224 224 \
+--workers 12
 ```
 
 ## 3. Training

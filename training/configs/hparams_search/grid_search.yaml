@@ -20,5 +20,5 @@ hydra:
     # define hyperparameter search space
     params:
       model.optimizer.lr: choice(0.001, 0.0001, 0.00001)
-      data.batch_size: choice(300)
-      model.optimizer.weight_decay: choice(0.0001, 0.0)
+      data.batch_size: choice(150, 200) # 200 for efficientformer and mobilenetv4 in my setup
+      model.optimizer.weight_decay: choice(0.00001)
