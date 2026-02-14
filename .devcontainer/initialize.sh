@@ -28,5 +28,9 @@ uv pip install \
 .venv/bin/pre-commit install || true
 
 mkdir -p ~/.ssh
+sudo chown -R vscode:vscode ~/.ssh
 chmod 700 ~/.ssh
-ssh-keyscan github.com >> ~/.ssh/known_hosts
+chmod 600 ~/.ssh/id_ed25519
+chmod 600 ~/.ssh/id_ed25519.pub
+chmod 644 ~/.ssh/known_hosts
+ssh -T git@github.com || true
