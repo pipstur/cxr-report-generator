@@ -3,7 +3,7 @@ import torch
 from timm.models.helpers import adapt_input_conv
 from torch import nn
 
-from training.src.models.components.loss_functions import BinaryFocalLoss
+from training.src.models.components.loss_functions import get_loss_function
 from training.src.models.components.model_class import Model
 
 torch.use_deterministic_algorithms(True, warn_only=True)
@@ -17,12 +17,14 @@ class MobileNetV4(Model):
         freeze_backbone: bool,
         grayscale: bool,
         num_classes: int,
+        loss_function: str,
+        focal_loss_parameters: dict,
     ):
         super().__init__(num_classes=num_classes)
-        self.criterion = BinaryFocalLoss()
+        self.criterion = get_loss_function(loss_function, focal_loss_parameters)
 
         backbone = timm.create_model(
-            "mobilenetv4_hybrid_medium.e500_r224_in1k", pretrained=True, num_classes=0
+            "mobilenetv4_conv_small.e2400_r224_in1k", pretrained=True, num_classes=0
         )
         if grayscale:
             conv = backbone.conv_stem
@@ -45,8 +47,8 @@ class MobileNetV4(Model):
 if __name__ == "__main__":
     import hydra
     import omegaconf
-    import roootutils
+    import rootutils
 
-    root = roootutils.setup_root(__file__, pythonpath=True)
+    root = rootutils.setup_root(__file__, pythonpath=True)
     cfg = omegaconf.OmegaConf.load(root / "configs" / "model" / "mobilenetv4.yaml")
     _ = hydra.utils.instantiate(cfg)

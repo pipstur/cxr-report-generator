@@ -43,3 +43,24 @@ class MultilabelFocalLoss(nn.Module):
         loss = (1 - pt) ** self.gamma * bce
 
         return loss.mean() if self.reduction == "mean" else loss.sum()
+
+
+def get_loss_function(loss_function: str, focal_loss_parameters: dict):
+    """Selects and returns the appropriate loss function."""
+    if loss_function == "bce":
+        return torch.nn.BCEWithLogitsLoss()
+    elif loss_function == "focal":
+        alpha, gamma, reduction = (
+            focal_loss_parameters.get("alpha", 0.8),
+            focal_loss_parameters.get("gamma", 2.0),
+            focal_loss_parameters.get("reduction", "mean"),
+        )
+        return BinaryFocalLoss(alpha=alpha, gamma=gamma, reduction=reduction)
+    elif loss_function == "multilabel_focal":
+        gamma, reduction = (
+            focal_loss_parameters.get("gamma", 2.0),
+            focal_loss_parameters.get("reduction", "mean"),
+        )
+        return MultilabelFocalLoss(gamma=gamma, reduction=reduction)
+    else:
+        raise ValueError(f"Unsupported loss function: {loss_function}")

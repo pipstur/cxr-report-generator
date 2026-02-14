@@ -16,4 +16,12 @@ scheduler:
 freeze_backbone: False
 grayscale: True
 
-num_classes: 14 # must match the number of selected attributes in data.label_selection attribute, if "all" then put 14
+num_classes: 1 # must match the number of selected attributes in data.label_selection attribute, if "all" then put 14
+
+loss_function: "focal" # options: "focal", "multilabel_focal", "bce"
+
+# Focal Loss parameters, only used if loss_function is set to "focal" or "multilabel_focal"
+focal_loss:
+  alpha: 0.8
+  gamma: 2.0
+  reduction: "mean"

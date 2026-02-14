@@ -2,6 +2,7 @@ import timm
 import torch
 from torch import nn
 
+from training.src.models.components.loss_functions import get_loss_function
 from training.src.models.components.model_class import Model
 
 torch.use_deterministic_algorithms(True, warn_only=True)
@@ -15,9 +16,11 @@ class EfficientFormer(Model):
         freeze_backbone: bool,
         grayscale: bool,
         num_classes: int,
+        loss_function: str,
+        focal_loss_parameters: dict,
     ):
         super().__init__(num_classes=num_classes)
-        self.criterion = nn.BCEWithLogitsLoss()
+        self.criterion = get_loss_function(loss_function, focal_loss_parameters)
 
         backbone = timm.create_model("efficientformerv2_s0", pretrained=True, num_classes=0)
         if grayscale:
@@ -53,8 +56,8 @@ class EfficientFormer(Model):
 if __name__ == "__main__":
     import hydra
     import omegaconf
-    import roootutils
+    import rootutils
 
-    root = roootutils.setup_root(__file__, pythonpath=True)
+    root = rootutils.setup_root(__file__, pythonpath=True)
     cfg = omegaconf.OmegaConf.load(root / "configs" / "model" / "efficientformer.yaml")
     _ = hydra.utils.instantiate(cfg)
