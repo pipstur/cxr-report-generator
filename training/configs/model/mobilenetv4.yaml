@@ -21,7 +21,7 @@ num_classes: 1 # must match the number of selected attributes in data.label_sele
 loss_function: "focal" # options: "focal", "multilabel_focal", "bce"
 
 # Focal Loss parameters, only used if loss_function is set to "focal" or "multilabel_focal"
-focal_loss:
+focal_loss_parameters:
   alpha: 0.8
   gamma: 2.0
   reduction: "mean"
