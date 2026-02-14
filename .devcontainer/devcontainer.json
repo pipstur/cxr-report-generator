@@ -29,7 +29,7 @@
           "/workspaces/cxr-report-generator/venv/bin/black"
         ],
         "python.formatting.provider": "none",
-        "python.defaultInterpreterPath": "/workspaces/cxr-report-generator/venv/bin/python",
+        "python.defaultInterpreterPath": "/workspaces/cxr-report-generator/.venv/bin/python",
         "editor.formatOnSave": true,
         "notebook.formatOnSave.enabled": true,
         "editor.defaultFormatter": "ms-python.black-formatter",
