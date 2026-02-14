@@ -29,7 +29,7 @@
           "/workspaces/cxr-report-generator/venv/bin/black"
         ],
         "python.formatting.provider": "none",
-        "python.defaultInterpreterPath": "/workspaces/cxr-report-generator/venv/bin/python",
+        "python.defaultInterpreterPath": "/workspaces/cxr-report-generator/.venv/bin/python",
         "editor.formatOnSave": true,
         "notebook.formatOnSave.enabled": true,
         "editor.defaultFormatter": "ms-python.black-formatter",
@@ -97,5 +97,8 @@
   "remoteUser": "vscode",
   "remoteEnv": {
     "SSH_AUTH_SOCK": "/run/host-services/ssh-auth.sock"
-  }
+  },
+  "mounts": [
+    "source=${env:USERPROFILE}\\.ssh,target=/home/vscode/.ssh,type=bind"
+  ]
 }
