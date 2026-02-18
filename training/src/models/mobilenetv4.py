@@ -1,6 +1,5 @@
 import timm
 import torch
-from timm.models.helpers import adapt_input_conv
 from torch import nn
 
 from training.src.models.components.loss_functions import get_loss_function
@@ -24,12 +23,11 @@ class MobileNetV4(Model):
         self.criterion = get_loss_function(loss_function, focal_loss_parameters)
 
         backbone = timm.create_model(
-            "mobilenetv4_conv_small.e2400_r224_in1k", pretrained=True, num_classes=0
+            "mobilenetv4_conv_small.e2400_r224_in1k",
+            pretrained=True,
+            num_classes=0,
+            in_chans=1 if grayscale else 3,
         )
-        if grayscale:
-            conv = backbone.conv_stem
-            conv.weight = nn.Parameter(adapt_input_conv(1, conv.weight))
-            conv.in_channels = 1
 
         self.feature_extractor = backbone
 

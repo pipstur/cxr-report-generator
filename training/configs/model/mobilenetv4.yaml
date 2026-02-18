@@ -4,7 +4,7 @@ optimizer:
   _target_: torch.optim.Adam
   _partial_: True
   lr: 0.001
-  weight_decay: 0.0
+  weight_decay: 0.00001
 
 scheduler:
   _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
