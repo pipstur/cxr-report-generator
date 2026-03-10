@@ -119,3 +119,27 @@ def get_metric_value(metric_dict: Dict[str, Any], metric_name: str) -> float:
     log.info(f"Retrieved metric value! <{metric_name}={metric_value}>")
 
     return metric_value
+
+
+def sum_metrics(previous_sum: dict, new_metrics: dict) -> dict:
+    new_sum = previous_sum.copy()
+    for k, v in new_metrics.items():
+        if k not in new_sum:
+            new_sum[k] = v
+        else:
+            new_sum[k] += v
+    return new_sum
+
+
+def avg_metrics(metrics_sum: dict, num_folds: int) -> dict:
+    avg_metrics = {}
+    for k, v in metrics_sum.items():
+        avg_metrics[k] = round(v / num_folds, 5)
+    return avg_metrics
+
+
+def convert_tensor_to_float(metrics: dict) -> dict:
+    for k, v in metrics.items():
+        metrics[k] = round(float(v), 5)
+
+    return metrics
