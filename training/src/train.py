@@ -17,6 +17,7 @@ from training.src import utils
 warnings.filterwarnings("ignore", category=UserWarning, module="torchmetrics.utilities.prints")
 
 log = utils.get_pylogger(__name__)
+torch.set_float32_matmul_precision("medium")
 
 
 @utils.task_wrapper
